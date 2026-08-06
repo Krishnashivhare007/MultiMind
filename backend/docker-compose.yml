@@ -1,0 +1,6 @@
+services:
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    # Container ek completely isolated environment hota hai. Ye line Container ke internal port 6379 (right side) ko aapke Mac ke local port 6379 (left side) ke saath ek "tunnel" bana kar jod deti hai.
