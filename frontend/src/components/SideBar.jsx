@@ -5,6 +5,7 @@ import {
   LogOut,
   MessageSquare,
   PanelLeftIcon,
+  PanelRight,
   PenBoxIcon,
   PenSquare,
   Plus,
@@ -42,12 +43,50 @@ function SideBar() {
       dispatch(setConversations(data));
     };
     getConv();
-  }, []);
+  }, [userData?._id]);
 
   const handleCreateConversation = async () => {
     const data = await createConversation();
     dispatch(addConversation(data));
   };
+
+   if(collapsed){
+    return(
+        <div className="hidden lg:flex flex-col items-center w-14 h-screen bg-[#0d0f14] border-r border-white/6 py-4 gap-1 shrink-0">
+            <button className="flex items-center justify-center w-9 h-9 rounded-xl text-slate-500 hover:text-slate-200 hover:bg-white/5 transition-colors duration-150 bg-transparent border-none cursor-pointer mb-1"
+            onClick={()=>setCollapsed(false)}>
+                <PanelRight/>
+            </button>
+
+            <button className="flex items-center justify-center w-9 h-9 rounded-xl text-slate-500 hover:text-slate-200 hover:bg-white/5 transition-colors duration-150 bg-transparent border-none cursor-pointer"
+            onClick={handleCreateConversation}>
+                <Plus size={17}/>
+            </button>
+
+             <div className="flex-1 overflow-y-auto px-2.5 pb-2 scrollbar-none [&:: -webkit-scrollbar]:hidden">
+          {conversations.map((conv, i) => {
+            const isActive = selectedConversation?._id == conv?._id;
+            return (
+              <div
+                key={conv?._id || i}
+                onClick={() => dispatch(setSelectedConversation(conv))}
+                className={`flex items-center gap-2.5 cursor-pointer mb-0.5 px-3 py-2.5 rounded-[10px] border transition-colors duration-150 hover:bg-white/5 ${isActive ? "bg-blue-500/10 border-blue-600/90" : "bg-transparent border-transparent"}`}
+              >
+                <div
+                  className={`flex items-center justify-center shrink-0 w-7 h-7 rounded-lg transition-colors duration-150
+                            ${isActive ? "bg-blue-500/15 text-blue-400" : "bg-white/5 text-slate-500"}`}
+                >
+                  <MessageSquare size={13} />
+                </div>
+                
+              </div>
+            );
+          })}
+        </div>
+
+        </div>
+    )
+  }
 
   return (
     <div className="fixed lg:static inset-y-0 left-0 z-50 w-67.5 h-screen shrink-0 bg-[#0d0f14] border-r border-white/6">
@@ -162,7 +201,7 @@ function SideBar() {
                 </div>
            </div> )   :
 
-           ( <button>
+           ( <button className="w-full flex items-center justify-center gap-2 text-sm font-medium text-slate-200 bg-white/5 border border-white/8 rounded-xl py-2.75 cursor-pointer hover:bg-white/8 transition-colors duration-150">
                 Login
            </button>)
         }
@@ -171,6 +210,9 @@ function SideBar() {
       </div>
     </div>
   );
+
+ 
+
 }
 
 export default SideBar;
