@@ -13,6 +13,9 @@ export const agent = async (req,res) => {
             prompt,conversationId
 
         })
+
+        console.log("Graph ka Asli Result:", result);
+        
         const response = result.aiResponse
         return res.status(200).json(response)
 

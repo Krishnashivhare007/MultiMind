@@ -5,7 +5,7 @@ export const chatAgent = async (state) => {
     const systemPrompt = "You are MultiMind, an intelligent AI assistant."
 
 
-    const response = (await llm).invoke([
+    const response = await llm.invoke([
         {
             "role":"system",
             "content":systemPrompt,
