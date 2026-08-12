@@ -63,7 +63,7 @@ function SideBar() {
                 <Plus size={17}/>
             </button>
 
-             <div className="flex-1 overflow-y-auto px-2.5 pb-2 scrollbar-none [&:: -webkit-scrollbar]:hidden">
+             <div className="flex-1 overflow-y-auto px-2.5 pb-2 scrollbar-none [&:: -webkit-scrollbar]:hidden pt-5">
           {conversations.map((conv, i) => {
             const isActive = selectedConversation?._id == conv?._id;
             return (
@@ -73,7 +73,7 @@ function SideBar() {
                 className={`flex items-center gap-2.5 cursor-pointer mb-0.5 px-3 py-2.5 rounded-[10px] border transition-colors duration-150 hover:bg-white/5 ${isActive ? "bg-blue-500/10 border-blue-600/90" : "bg-transparent border-transparent"}`}
               >
                 <div
-                  className={`flex items-center justify-center shrink-0 w-7 h-7 rounded-lg transition-colors duration-150
+                  className={`flex items-center justify-center shrink-0 w-5 h-5 rounded-lg transition-colors duration-150
                             ${isActive ? "bg-blue-500/15 text-blue-400" : "bg-white/5 text-slate-500"}`}
                 >
                   <MessageSquare size={13} />
@@ -83,6 +83,21 @@ function SideBar() {
             );
           })}
         </div>
+
+        <div className="relative shrink-0">
+                {
+                    (userData?.avatar && !imageError) ? 
+                    <img className="w-9 h-9 rounded-[10px] object-cover border-2 border-blue-500/25"
+                    src={userData?.avatar} 
+                    alt={"image"}
+                    referrerPolicy="no-referrer" 
+                    onError={()=>setImageError(true)}/>
+                    :
+                    <div className="w-9 h-9 rounded-[10px] bg-white/6 flex items-center justify-center">
+                        <User size={15} className="text-slate-400"/>
+                    </div>
+                }
+            </div>
 
         </div>
     )
@@ -165,7 +180,7 @@ function SideBar() {
 
             <div className="relative shrink-0">
                 {
-                    (userData?.avatar || !imageError) ? 
+                    (userData?.avatar && !imageError) ? 
                     <img className="w-9 h-9 rounded-[10px] object-cover border-2 border-blue-500/25"
                     src={userData?.avatar} 
                     alt={"image"}
