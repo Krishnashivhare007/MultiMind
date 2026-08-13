@@ -17,6 +17,12 @@ export const agent = async (req,res) => {
         console.log("Graph ka Asli Result:", result);
         
         const response = result.aiResponse
+
+        await axios.post(`${process.env.CHAT_SERVICE}/save-message`,{
+            conversationId,role:'assistant',content:response
+        })
+
+
         return res.status(200).json(response)
 
     } catch (error) {
