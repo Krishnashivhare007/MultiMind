@@ -25,7 +25,7 @@ export const addMessage = async (conversationId,role,content) => {
     })
 
     if(messages.length>20){
-        messages.shift()
+        messages.splice(0, 2);
     }
 
     await redis.set(key,JSON.stringify(messages))
