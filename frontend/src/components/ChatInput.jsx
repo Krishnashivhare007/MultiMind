@@ -1,4 +1,4 @@
-import { Mic, Paperclip, Send } from 'lucide-react'
+import { Code2, FileText, Globe, ImageIcon, MessageSquare, MessagesSquare, Mic, Paperclip, Presentation, Send, Zap } from 'lucide-react'
 import React, { useState } from 'react'
 import { sendMessage } from '../features/sendMessage'
 import { useDispatch, useSelector } from 'react-redux'
@@ -9,6 +9,9 @@ import { updateConversation } from '../features/updateConversation'
 
 function ChatInput() {
     const [value,setValue] = useState("")
+
+    const [selectedAgent,setSelectedAgent] = useState("Auto")
+
     const {selectedConversation} = useSelector(state=>state.conversation)
     const {messages} = useSelector(state=>state.message) 
     const dispatch = useDispatch()
@@ -41,9 +44,77 @@ function ChatInput() {
         console.log(data);
         
     }
+
+    const agents = [
+        {
+            id:"auto",
+            icon:Zap,
+            label:"Auto"
+        },
+        {
+            id:"chat",
+            icon:MessageSquare,
+            label:"Chat"
+        },
+        {
+            id:"coding",
+            icon:Code2,
+            label:"Coding"
+        },
+        {
+            id:"pdf",
+            icon:FileText,
+            label:"PDF"
+        },
+        {
+            id:"ppt",
+            icon:Presentation,
+            label:"PPT"
+        },
+        {
+            id:"image",
+            icon:ImageIcon,
+            label:"Image"
+        },
+        {
+            id:"search",
+            icon:Globe,
+            label:"Search"
+        },
+    ]
   return (
     <div className='w-full overflow-hidden px-3 md:px-5 py-4 border-t border-white/6 bg-[#0d0f14]'>
         <div className='flex flex-col gap-2 bg-white/3 border border-white/7 rounded-2xl px-4 pt-3.5 pb-3'>
+
+            <div className='flex w-full gap-2 pr-2 flex-wrap'>
+                {agents.map((agent)=>{
+                    
+                    const isActive = selectedAgent === agent.label
+                    const Icon = agent.icon
+                    return (
+
+                        <div 
+                        key={agent.id}
+                        onClick={() => setSelectedAgent(agent.label)}
+                        className={`
+                        shrink-0 cursor-pointer inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium border transition-all
+
+                        ${
+                            isActive?
+                            "bg-linear-to-r from-blue-500 to-blue-700 text-white border-transparent shadow-[0_1px_8px_rgba(99,102,241,.35)]":
+                            "bg-white/3 text-slate-400 border-white/6 hover:bg-white/7"
+                        }
+                        `}>
+
+                            <Icon size={14} className={isActive ? "text-white":"text-slate-500"}/>
+
+                            {agent.label}
+
+                        </div>
+                    )
+                })}
+            </div>
+
             <textarea
             onChange={(e)=>setValue(e.target.value)}
             value={value}
