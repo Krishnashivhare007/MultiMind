@@ -11,7 +11,8 @@ conversationId:{
             type:String,
             enum:["user","assistant"]
         },
-        content:String
+        content:String,
+        images:[String]
     },
 {timestamps:true}
 )

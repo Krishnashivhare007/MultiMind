@@ -31,7 +31,7 @@ function ChatInput() {
         }
 
         const payload = {
-            prompt:value.trim(), conversationId:conversation?._id
+            prompt:value.trim(), conversationId:conversation?._id, agent:selectedAgent.toLowerCase()
         }
 
 
@@ -40,8 +40,8 @@ function ChatInput() {
         setValue("");
 
         const data = await sendMessage(payload)
-        dispatch(addMessage({role:"assistant",content:data}))
-        console.log(data);
+        dispatch(addMessage({role:"assistant",content:data.answer || data.content,images:data.images}))
+        console.log(data)
         
     }
 

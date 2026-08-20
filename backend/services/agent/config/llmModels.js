@@ -3,11 +3,12 @@ import { HumanMessage } from "@langchain/core/messages";
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 
 const groq = new ChatGroq({
-  model: "llama-3.3-70b-versatile",
+  model: "openai/gpt-oss-120b",
+  apiKey:process.env.GROQ_API_KEY
 });
 
 const gemini = new ChatGoogleGenerativeAI({
-  model: "gemini-1.5-flash",
+  model: "gemini-3.6-flash",
 });
 
 
