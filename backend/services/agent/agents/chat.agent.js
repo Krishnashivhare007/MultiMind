@@ -24,6 +24,7 @@ export const chatAgent = async (state) => {
 
     - Use search results to answer.
     - Do not mention internal tools.
+    - IMPORTANT: Always include exact source URLs from the search data as clickable markdown links at the end of your points. Format strictly as: [Source Name](URL).
 
     Rules:
 
@@ -48,10 +49,10 @@ export const chatAgent = async (state) => {
 
     history.forEach(msg => {
         if(msg.role=="user"){
-            messages.push(new HumanMessage(msg.content))
+            messages.push(new HumanMessage(msg.content) || "")
         }
         if(msg.role=="assistant"){
-            messages.push(new AIMessage(msg.content))
+            messages.push(new AIMessage(msg.content) || "")
         }
     });
 
