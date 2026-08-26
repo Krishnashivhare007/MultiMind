@@ -79,6 +79,7 @@ export const codingAgent = async (state) => {
             - No extra text
             - No \`\`\`
             - Never mention intent
+            - Keep code concise and minimal. Do not generate overly massive HTML/CSS.
 
             User Request: 
             ${state.prompt}
