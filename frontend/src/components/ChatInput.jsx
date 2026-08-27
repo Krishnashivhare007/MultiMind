@@ -73,9 +73,9 @@ function ChatInput() {
             label:"PPT"
         },
         {
-            id:"image",
+            id:"Vision",
             icon:ImageIcon,
-            label:"Image"
+            label:"Vision"
         },
         {
             id:"search",

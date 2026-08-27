@@ -20,11 +20,11 @@ function Artifact() {
 
   const { artifacts } = useSelector((state) => state.message);
 
-  if (artifacts.length == 0) return;
+  
+  if (!artifacts || artifacts.length === 0) return null;
 
   
-
-  const file = artifacts[0]?.files[activeFile];
+  const file = artifacts[0]?.files?.[activeFile];
 
   const htmlFile = artifacts[0]?.files?.find(f=>f.name==='index.html')
   const cssFile = artifacts[0]?.files?.find(f=>f.name==='style.css')

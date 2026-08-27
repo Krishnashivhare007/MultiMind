@@ -6,7 +6,7 @@ import { searchAgent } from "../agents/search.agent.js";
 import { codingAgent } from "../agents/coding.agent.js";
 import { pdfAgent } from "../agents/pdf.agent.js";
 import { pptAgent } from "../agents/ppt.agent.js";
-import { imageGenAgent } from "../agents/vision.agent.js";
+import { visionAgent } from "../agents/vision.agent.js";
 
 const workflow = new StateGraph(agentState)
 
@@ -16,7 +16,7 @@ workflow.addNode("search",searchAgent)
 workflow.addNode("coding",codingAgent)
 workflow.addNode("pdf",pdfAgent)
 workflow.addNode("ppt",pptAgent)
-workflow.addNode("vision",imageGenAgent)
+workflow.addNode("vision",visionAgent)
 
 
 workflow.addEdge("__start__","router")
