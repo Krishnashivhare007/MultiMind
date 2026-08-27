@@ -1,4 +1,5 @@
 import {
+  Check,
   Code2,
   Copy,
   Eye,
@@ -14,11 +15,14 @@ import Editor from '@monaco-editor/react';
 function Artifact() {
   const [tab, setTab] = useState("code");
   const [collapsed, setCollapsed] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [activeFile, setActiveFile] = useState(0);
 
   const { artifacts } = useSelector((state) => state.message);
 
   if (artifacts.length == 0) return;
+
+  
 
   const file = artifacts[0]?.files[activeFile];
 
@@ -27,6 +31,14 @@ function Artifact() {
   const jsFile = artifacts[0]?.files?.find(f=>f.name==='script.js')
 
   const canPreview = Boolean(htmlFile)
+
+  const handleCopy = async()=>{
+    await navigator.clipboard.writeText(file?.content || "")
+    setCopied(true)
+    setTimeout(() => {
+      setCopied(false)
+    }, 2000);
+  }
   
   const previewDoc = `<!doctype html>
 <html lang="en">
@@ -113,8 +125,10 @@ const detectLanguage = (fileName="")=>{
             </div>
 
             <div className="flex items-center gap-1 shrink-0">
-              <button className="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium text-slate-400 hover:text-slate-200 hover:bg-white/5 rounded-lg transition-colors duration-150 bg-transparent border-none cursor-pointer">
-                <Copy size={15} />
+              <button 
+              onClick={()=>handleCopy()}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium text-slate-400 hover:text-slate-200 hover:bg-white/5 rounded-lg transition-colors duration-150 bg-transparent border-none cursor-pointer">
+                {copied? <Check size={15}/> : <Copy size={15} />}
               </button>
             </div>
 
