@@ -48,22 +48,18 @@ export const visionAgent = async (state) => {
          await uploadToS3(filename,buffer,"image/png")
          console.log("upload bhi ho gya");
  
-         const downloadUrl = await getFromS3(filename,24*60*60)
+         const downloadUrl = await getFromS3(filename,24*60)
 
          console.log("last tk bhi pahuch gya");
          
          return {
-             ...state,
-             aiResponse:`
-             # 🏞️ Image Generated Successfully
- 
-             ![Generated Image](${downloadUrl})
- 
-             ⬇️ [Download Image](${downloadUrl})
- 
-             ⏳ Link expires in 24 hours
-             `
-         }
+            ...state,
+            aiResponse: `![Generated Image](${downloadUrl})
+
+⬇️ [Download Image](${downloadUrl})
+
+⏳ Link expires in 24 hours`
+        }
  
    } catch (error) {
     console.error("🚨 VISION AGENT CRASH WALA ERROR 👉:", error);
