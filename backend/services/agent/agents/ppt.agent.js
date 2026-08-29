@@ -52,7 +52,6 @@ export const pptAgent = async (state) => {
         const buffer = await ppt.write({
             outputType:"nodebuffer"
         })
-        console.log("ye rha buffer: ",buffer);
         
 
         const fileName = `ppt-${Date.now()}.pptx`
