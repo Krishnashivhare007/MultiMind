@@ -24,6 +24,7 @@ import { logOut } from "../features/logOut";
 import { setUserData } from "../redux/userSlice";
 import { getMessages } from "../features/getMessages";
 import { setMessages } from "../redux/messageSlice";
+import BillingDrawer from "./BillingDrawer";
 
 function SideBar() {
   const [collapsed, setCollapsed] = useState(false);
@@ -38,6 +39,7 @@ function SideBar() {
   const dispatch = useDispatch();
 
   const [imageError,setImageError] = useState(false)
+  const [showBilling,setShowBilling] = useState(false)
 
   useEffect(() => {
     const getConv = async () => {
@@ -213,7 +215,9 @@ function SideBar() {
                 </p>
             </div>
                 <div className="flex gap-1">
-                    <button className="flex items-center justify-center w-7 h-7 rounded-[7px] border-none bg-transparent text-yellow-600 cursor-pointer hover:bg-white/8 hover:text-slate-400 transition-all duration-150">
+                    <button 
+                    onClick={()=>setShowBilling(true)}
+                    className="flex items-center justify-center w-7 h-7 rounded-[7px] border-none bg-transparent text-yellow-600 cursor-pointer hover:bg-white/8 hover:text-slate-400 transition-all duration-150">
                         <CircleEuro size={16}/>
                     </button>
                     <button className="flex items-center justify-center w-7 h-7 rounded-[7px] border-none bg-transparent text-slate-600 cursor-pointer hover:bg-white/8 hover:text-slate-400 transition-all duration-150"
@@ -234,6 +238,9 @@ function SideBar() {
           </div>
 
       </div>
+
+      <BillingDrawer open={showBilling} onClose={()=>setShowBilling(false)}/>
+
     </div>
   );
 
