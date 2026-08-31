@@ -1,13 +1,14 @@
 import { PLANS } from "../config/plans.js"
 import razorpay from "../config/razorpay.js"
 import { Payment } from "../models/payment.model.js"
+import crypto from 'crypto';
 import axios from "axios";
 
 export const createOrder = async (req,res) => {
     try {
         const {plan} = req.body
        const userId = req.headers["x-user-id"] 
-       const selectedPlan = PLANS(plan)
+       const selectedPlan = PLANS[plan]
 
         if(!selectedPlan){
             return res.status(404).json({message:"plan not found"})
@@ -36,16 +37,16 @@ export const createOrder = async (req,res) => {
     }
 }
 
-export const verifyPayment = async () => {
+export const verifyPayment = async (req,res) => {
     try {
-        const {razorpay_order_id,razorpay_payment_id,razorpay_signanture}=req.body
+        const {razorpay_order_id,razorpay_payment_id,razorpay_signature}=req.body
 
         const generateSignature = crypto
         .createHmac("sha256",process.env.RAZORPAY_KEY_SECRET)
-        .update(`${razorpay_order_id} | ${razorpay_payment_id}`)
+        .update(`${razorpay_order_id}|${razorpay_payment_id}`)
         .digest("hex")
 
-        if(generateSignature!==razorpay_signanture){
+        if(generateSignature!==razorpay_signature){
             return res.status(400).json({message:"Payment Verification Failed"})
         }
 
@@ -59,7 +60,10 @@ export const verifyPayment = async () => {
         payment.paymentId=razorpay_payment_id
         await payment.save()
 
-        await axios.post(`${process.env.AUTH_SERVICE}/update-plan`,{userId:payment.userId,plan:payment.plan,credits:payment.credits})
+        const data=await axios.post(`${process.env.AUTH_SERVICE}/update-plan`,{userId:payment.userId,plan:payment.plan,credits:payment.credits})
+
+        console.log(data);
+        
 
         return res.status(200).json({message:"Payment Verified"})
 

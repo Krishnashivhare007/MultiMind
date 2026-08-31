@@ -1,11 +1,61 @@
 import React from 'react'
 import {AnimatePresence, motion} from 'motion/react'
-import { Crown, X } from 'lucide-react'
-import { useSelector } from 'react-redux'
+import { Crown, Currency, X } from 'lucide-react'
+import { useDispatch, useSelector } from 'react-redux'
+import { createOrder } from '../features/createOrder'
+import { verifyPayment } from '../features/verifyPayment'
+import { setUserData } from '../redux/userSlice'
 
 function BillingDrawer({open,onClose}) {
 
     const {userData} = useSelector(state=>state.user)
+    const dispatch = useDispatch()
+
+    const handleUpgrade = async (plan) => {
+        try {
+            const data = await createOrder(plan)
+            const options = {
+                key:import.meta.env.VITE_RAZORPAY_KEY_ID,
+                amount:data?.order?.amount,
+                currency:data?.order?.currency,
+                name:"MultiMind",
+                description:`${data?.plan?.name} Plan`,
+                order_id:data?.order?.id,
+                handler:async (response)=>{
+                    try {
+                        const data = await verifyPayment(response)
+                        console.log(data);
+
+                        const addedCredits = plan === "pro" ? 1000 : 500;
+                    
+                    dispatch(setUserData
+                        ({
+                        ...userData,
+                        plan: plan,
+                        credits: (userData?.credits || 0) + addedCredits,
+                        totalCredits: (userData?.totalCredits || 0) + addedCredits
+                    }));
+
+                    onClose();
+                        
+                    } catch (error) {
+                        console.log(error);
+                        
+                    }
+                    
+                },
+                theme:{
+                    color:"#4F46E5"
+                }
+            }
+
+            const razorpay = new window.Razorpay(options)
+            razorpay.open()
+        } catch (error) {
+            console.log(error);
+            
+        }
+    }
 
   return (
     <AnimatePresence>
@@ -83,22 +133,20 @@ function BillingDrawer({open,onClose}) {
             <h3 className='text-white font-semibold'>Starter Plan</h3>
             <p className='text-blue-400 text-2xl font-bold mt-2'>₹199</p>
             <p className='text-slate-400 text-sm mt-1'>500 Credits</p>
-            <button className='mt-4 w-full rounded-lg bg-blue-600 hover:bg-blue-700 py-2 text-white'>Upgrade</button>
+            <button onClick={()=>handleUpgrade("starter")}
+            className='mt-4 w-full rounded-lg bg-blue-600 hover:bg-blue-700 py-2 text-white'>Upgrade</button>
         </div>
-
-    </div>
-
-    <div className='px-5 flex-1 overflow-auto space-y-4'>
 
         <div className='rounded-xl border border-white/10 p-4'>
             <h3 className='text-white font-semibold'>Pro Plan</h3>
             <p className='text-blue-400 text-2xl font-bold mt-2'>₹499</p>
             <p className='text-slate-400 text-sm mt-1'>1000 Credits</p>
-            <button className='mt-4 w-full rounded-lg bg-blue-600 hover:bg-blue-700 py-2 text-white'>Upgrade</button>
+            <button onClick={()=>handleUpgrade("pro")}
+            className='mt-4 w-full rounded-lg bg-blue-600 hover:bg-blue-700 py-2 text-white'>Upgrade</button>
         </div>
 
     </div>
-    
+
     
     </motion.div>
     

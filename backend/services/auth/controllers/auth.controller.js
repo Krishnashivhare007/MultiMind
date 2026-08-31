@@ -22,6 +22,9 @@ export const login = async (req, res) => {
         }
 
         const sessionId = crypto.randomUUID()
+
+        await redis.set(`user-session-${user?._id}`,sessionId,"EX",7*24*60*60)
+
         await redis.set(`session-${sessionId}`,JSON.stringify({
             userId:user._id,
             name:user.name,
@@ -75,8 +78,10 @@ export const updateUserPayment = async (req,res) => {
 
         await user.save()
 
-        const sessionId = req.cookies?.session 
-        await redis.set(`session-${sessionId}`,JSON.stringify({
+        const sessionId = await redis.get(`user-session-${userId}`);
+
+        if(sessionId){
+            await redis.set(`session-${sessionId}`,JSON.stringify({
             userId:user._id,
             name:user.name,
             email:user.email,
@@ -86,10 +91,62 @@ export const updateUserPayment = async (req,res) => {
             totalCredits:user.totalCredits,
             planExpiresAt:user.planExpiresAt
         }),"EX",7*24*60*60)
+        }
 
         return res.status(200).json({success:true})
 
     } catch (error) {
         return res.status(500).json({message:`update user payment error: ${error}`})
+    }
+}
+
+export const deductCredits = async (req,res) => {
+    try {
+        const {userId,agent} = req.body
+
+        const COST = {
+            chat : 5,
+            search : 10,
+            coding : 50,
+            pdf:30,
+            ppt:30,
+            vision:25
+        } 
+
+        const user = await User.findById(userId)
+
+        if(!user){
+            return res.status(400).json({message:"User not found"})
+        }
+
+        const requiredCredits = COST[agent] || 1
+
+        if(user.credits<requiredCredits){
+            return res.status(400).json({message:"Not enough credits"})
+        }
+
+        user.credits-= requiredCredits
+
+        await user.save()
+
+        const sessionId = await redis.get(`user-session-${userId}`);
+
+        if(sessionId){
+            await redis.set(`session-${sessionId}`,JSON.stringify({
+            userId:user._id,
+            name:user.name,
+            email:user.email,
+            avatar:user.avatar,
+            plan:user.plan,
+            credits:user.credits,
+            totalCredits:user.totalCredits,
+            planExpiresAt:user.planExpiresAt
+        }),"EX",7*24*60*60)
+        }
+
+         return res.status(200).json({success:true,credits:user.credits})
+
+    } catch (error) {
+        return res.status(500).json({message:`deduct credits error ${error}`})
     }
 }
