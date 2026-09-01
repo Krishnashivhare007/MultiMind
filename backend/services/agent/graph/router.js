@@ -1,4 +1,5 @@
 import { getModel } from "../config/llmModels.js"
+import { agent } from "../controllers/agent.controller.js";
 
 
 export const router = async (state) => {
@@ -12,6 +13,19 @@ export const router = async (state) => {
 }
     }
 
+    if(state.file.mimetype==="application/pdf"){
+        return {
+            ...state,
+            agent:"pdfRag"
+        }
+    }
+
+    if(state.file.mimetype.startsWith==="image/"){
+        return {
+            ...state,
+            agent:"imageAnalyzer"
+        }
+    }
 
     const llm =await getModel("router")
     const prompt = `you are an agent router.

@@ -36,6 +36,10 @@ export const getModel = async (agent)=>{
             return groq;
         case "vision":
             return groq;
+        case "pdfRag":
+            return groq;
+        case "imageAnalyzer":
+            return gemini;
         default:
             return groq;
     }

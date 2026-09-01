@@ -7,6 +7,11 @@ export const agent = async (req,res) => {
     try {
         let {prompt,conversationId,agent} = req.body
 
+        const file = req.file
+
+        const userId = req.headers["x-user-id"]
+        
+
         await redis.del(`messages-${conversationId}`)
 
         
@@ -16,7 +21,7 @@ export const agent = async (req,res) => {
         })
 
         const result = await graph.invoke({
-            prompt,conversationId,agent
+            prompt,conversationId,agent,userId,file
 
         })
 

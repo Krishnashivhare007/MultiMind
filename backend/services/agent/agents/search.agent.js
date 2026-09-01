@@ -1,4 +1,5 @@
 import { searchTool } from "../config/tavily.js"
+import { deductCredits } from "../utils/deductCredits.js";
 
 
 export const searchAgent = async (state) => {
@@ -11,6 +12,8 @@ export const searchAgent = async (state) => {
             .slice(0, 3) 
             .map(res => `Title: ${res.title}\nURL: ${res.url}\nInfo: ${res.content}`)
             .join("\n\n");
+
+            await deductCredits(state.userId,"search")
 
         return {
             ...state,

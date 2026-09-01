@@ -2,6 +2,7 @@ import { getModel } from "../config/llmModels.js"
 import axios from 'axios'
 import { uploadToS3 } from "../utils/uploadTOS3.js"
 import { getFromS3 } from "../utils/getFromS3.js"
+import { deductCredits } from "../utils/deductCredits.js"
 
 export const visionAgent = async (state) => {
 
@@ -51,6 +52,8 @@ export const visionAgent = async (state) => {
          const downloadUrl = await getFromS3(filename,24*60)
 
          console.log("last tk bhi pahuch gya");
+
+         await deductCredits(state.userId,"vision")
          
          return {
             ...state,
