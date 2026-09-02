@@ -6,6 +6,7 @@ import { addMessage, setArtifacts, setMessages } from '../redux/messageSlice'
 import { createConversation } from '../features/createConversation'
 import { addConversation, setConvTitle, setSelectedConversation } from '../redux/conversationSlice'
 import { updateConversation } from '../features/updateConversation'
+import { useRef } from 'react'
 
 function ChatInput() {
     const [value,setValue] = useState("")
@@ -14,6 +15,9 @@ function ChatInput() {
 
     const {selectedConversation} = useSelector(state=>state.conversation)
     const {messages} = useSelector(state=>state.message) 
+    const [selectedFile, setSelectedFile] = useState(null)
+    const fileRef = useRef(null)
+
     const dispatch = useDispatch()
 
     const handleSendMessage = async () => {
@@ -27,19 +31,21 @@ function ChatInput() {
 
         if(conversation.title=="New Chat"){
             await updateConversation({id:conversation?._id,title:value.trim()})
-            dispatch(setConvTitle({conversationId:conversation._id,title:value.trim()}))
+            dispatch(setConvTitle({conversationId:conversation?._id,title:value.trim()}))
         }
 
-        const payload = {
-            prompt:value.trim(), conversationId:conversation?._id, agent:selectedAgent.toLowerCase()
-        }
-
-
+        console.log(selectedFile);
+        
+        const formData = new FormData()
+        formData.append("prompt",value.trim())
+        formData.append("conversationId",conversation?._id)
+        formData.append("agent",selectedAgent.toLowerCase())
+        formData.append("file",selectedFile)
 
         dispatch(addMessage({role:"user",content:value.trim()}))
         setValue("");
 
-        const data = await sendMessage(payload)
+        const data = await sendMessage(formData)
         dispatch(setArtifacts(data.artifacts) || [])
         dispatch(addMessage({role:"assistant",content:data.answer || data.content,images:data.images}))
         console.log(data)
@@ -116,6 +122,13 @@ function ChatInput() {
                 })}
             </div>
 
+                {selectedFile && (
+                    <div className='my-3'>
+                        <div className=''>
+
+                        </div>
+                    </div>)}
+
             <textarea
             onChange={(e)=>setValue(e.target.value)}
             value={value}
@@ -124,7 +137,16 @@ function ChatInput() {
             rows={2}/>
             <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-1'>
-                    <button className='flex items-center justify-center w-8 h-8 rounded-lg text-slate-600 hover:text-slate-400 hover:bg-white/5 border border-transparent hover:border-white/6 transition-all duration-150 bg-transparent cursor-pointer'>
+                    <input type="file" accept='.pdf,image/*' hidden ref={fileRef} onChange={(e)=>{
+                        const file = e.target.files[0]
+
+                        if(file){
+                            setSelectedFile(file)
+                        }
+                    }}/>
+                    <button 
+                    onClick={()=>fileRef.current.click()}
+                    className='flex items-center justify-center w-8 h-8 rounded-lg text-slate-600 hover:text-slate-400 hover:bg-white/5 border border-transparent hover:border-white/6 transition-all duration-150 bg-transparent cursor-pointer'>
                         <Paperclip size={16}/>
                     </button>
                     <button className='flex items-center justify-center w-8 h-8 rounded-lg text-slate-600 hover:text-slate-400 hover:bg-white/5 border border-transparent hover:border-white/6 transition-all duration-150 bg-transparent cursor-pointer'>

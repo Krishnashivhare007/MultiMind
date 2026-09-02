@@ -9,6 +9,9 @@ export const agent = async (req,res) => {
 
         const file = req.file
 
+        console.log("file: ",file);
+        
+
         const userId = req.headers["x-user-id"]
         
 
