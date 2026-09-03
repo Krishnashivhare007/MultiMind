@@ -1,32 +1,33 @@
+import { checkAgentLimit } from "../config/agentlimit.js"
 import { getModel } from "../config/llmModels.js"
 import { deductCredits } from "../utils/deductCredits.js"
 
 export const codingAgent = async (state) => {
-    const intentLLm = await getModel("intent")
-    const llm = await getModel("coding")
+    try {
+        await checkAgentLimit(state.userId, "coding")
+        const intentLLm = await getModel("intent")
+        const llm = await getModel("coding")
 
-    const intentRes = await intentLLm.invoke(`
-        You are an intent classifier,
+        const intentRes = await intentLLm.invoke(`
+            You are an intent classifier,
 
-        Return ONLY one of these values:
+            Return ONLY one of these values:
 
-        CODE_GENERATION
-        CODE_REVIEW,
-        CODE_EXPLANATION
-        DEBUGGING
-        OPTIMIZATION
-        CONVERSION
-        DOCUMENTATION
+            CODE_GENERATION
+            CODE_REVIEW,
+            CODE_EXPLANATION
+            DEBUGGING
+            OPTIMIZATION
+            CONVERSION
+            DOCUMENTATION
 
-        user Request:
-        ${state.prompt}
-        `)
-
-
+            user Request:
+            ${state.prompt}
+            `)
 
         const intent = intentRes.content.trim().toUpperCase();
         
-        if(intent=="CODE_GENERATION"){
+        if (intent == "CODE_GENERATION") {
             const prompt = `
             You are MultiMind Coding Agent.
 
@@ -93,37 +94,35 @@ export const codingAgent = async (state) => {
             ${state.prompt}
             `
 
-            const res =await llm.invoke(prompt)
+            const res = await llm.invoke(prompt)
 
             let cleanContent = res.content
-            .replace(/```json/gi, "") 
-            .replace(/```/g, "")      
-            .trim();                  
+                .replace(/```json/gi, "") 
+                .replace(/```/g, "")      
+                .trim();                  
 
-        let data = {};
+            let data = {};
 
             try {
-           
-            data = JSON.parse(cleanContent);
-        } catch (error) {
-            console.error("JSON Parse Error! LLM ne ye bheja tha:", res.content);
-           
-            data = { files: [] }; 
-        }
+                data = JSON.parse(cleanContent);
+            } catch (error) {
+                console.error("JSON Parse Error! LLM ne ye bheja tha:", res.content);
+                data = { files: [] }; 
+            }
 
-        await deductCredits(state.userId,"coding")
+            await deductCredits(state.userId, "coding")
 
-            return{
+            return {
                 ...state,
-                aiResponse:"Code Generated Successfully.",
-                artifacts:[
+                aiResponse: "Code Generated Successfully.",
+                artifacts: [
                     {
-                    title:state.prompt,
-                    id:Date.now(),
-                    type:"Project",
-                    files:data.files || []
-                }
-            ]
+                        title: state.prompt,
+                        id: Date.now(),
+                        type: "Project",
+                        files: data.files || []
+                    }
+                ]
             }
         }
 
@@ -155,14 +154,32 @@ export const codingAgent = async (state) => {
             ${state.prompt}
             `)
 
-            const data = res.content
+        const data = res.content
 
-            await deductCredits(state.userId,"coding")
+        await deductCredits(state.userId, "coding")
 
-            return {
-                ...state,
-                aiResponse:data,
-                artifacts:[]
-            }
+        return {
+            ...state,
+            aiResponse: data,
+            artifacts: []
+        }
+
+    } catch (error) {
+        console.error("Error in codingAgent:", error);
         
+         if(error.status==429){
+            return {
+             ...state,
+             aiResponse:
+             error?.data?.message,
+             artifacts: []
+         }
+        }
+        
+        return {
+            ...state,
+            aiResponse: "Failed to process coding request. Please try again.",
+            artifacts: []
+        }
+    }
 }

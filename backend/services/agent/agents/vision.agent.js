@@ -3,10 +3,14 @@ import axios from 'axios'
 import { uploadToS3 } from "../utils/uploadTOS3.js"
 import { getFromS3 } from "../utils/getFromS3.js"
 import { deductCredits } from "../utils/deductCredits.js"
+import { checkAgentLimit } from "../config/agentlimit.js"
 
 export const visionAgent = async (state) => {
 
    try {
+
+      await checkAgentLimit(state.userId,"image")
+      
      const llm = await getModel("image")
  
      const res = await llm.invoke(`
@@ -65,7 +69,15 @@ export const visionAgent = async (state) => {
         }
  
    } catch (error) {
-    console.error("🚨 VISION AGENT CRASH WALA ERROR 👉:", error);
+    
+    if(error.status==429){
+            return {
+             ...state,
+             aiResponse:
+             error?.data?.message
+         }
+        }
+
      return {
              ...state,
              aiResponse:`

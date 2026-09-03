@@ -3,7 +3,7 @@ import { graph } from '../graph/graph.js'
 import { addMessage } from '../config/memory.js'
 import redis from '../../../shared/redis/redis.js'
 
-export const agent = async (req,res) => {
+export const agent = async (req,res,next) => {
     try {
         let {prompt,conversationId,agent} = req.body
 
@@ -45,8 +45,7 @@ export const agent = async (req,res) => {
         })
 
     } catch (error) {
-        console.error("🚨 BACKEND CRASH HUA HAI:", error);
-        return res.status(500).json({message:`agent error ${error}`})
+        next(error)
     }
 }
 

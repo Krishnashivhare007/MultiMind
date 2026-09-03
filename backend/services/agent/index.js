@@ -15,6 +15,17 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use("/",router)
 
+app.use((err,req,res,next)=>{
+    console.log(err)
+
+    if(err.status){
+        return res.status(err.status).json(err.data)
+    }
+
+    return res.status(500).json({message:`agent error ${err}`})
+
+})
+
 app.get('/',(req,res)=>{
     res.json({message:'hello from agent'})
 })

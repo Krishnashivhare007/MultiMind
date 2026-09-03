@@ -149,7 +149,7 @@ function SideBar() {
             MultiMind
           </span>
           <span className="text-[10px] font-medium text-blue-500 bg-indigo-500/10 border border-indigo-500/20 hover:border-blue-500 px-2 py-0.5 rounded-full tracking-wide">
-           {userData?.plan.charAt(0).toUpperCase() + userData?.plan.slice(1)}
+           {(userData?.plan.charAt(0).toUpperCase() + userData?.plan.slice(1)) || "Free"}
           </span>
           <button
             className="flex items-center justify-center w-7 h-7 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-white/5 transition-colors duration-150 bg-transparent border-none cursor-pointer"
@@ -236,7 +236,7 @@ function SideBar() {
                     {userData?.name || "user"}
                 </p>
                 <p className="text-[12px] text-slate-500 mt-px">
-                    {userData?.plan.charAt(0).toUpperCase() + userData?.plan.slice(1)}
+                    {(userData?.plan.charAt(0).toUpperCase() + userData?.plan.slice(1)) || "Free"}
                 </p>
             </div>
                 <div className="flex gap-1">

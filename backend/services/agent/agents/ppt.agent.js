@@ -1,3 +1,4 @@
+import { checkAgentLimit } from "../config/agentlimit.js"
 import { getModel } from "../config/llmModels.js"
 import { deductCredits } from "../utils/deductCredits.js"
 import { generatePPT } from "../utils/generatePpt.js"
@@ -5,7 +6,10 @@ import { getFromS3 } from "../utils/getFromS3.js"
 import { uploadToS3 } from "../utils/uploadTOS3.js"
 
 export const pptAgent = async (state) => {
+
+
     try {
+        await checkAgentLimit(state.userId,"ppt")
         const llm = await getModel("ppt")
         const prompt = `
         You are a professional presentation designer.
@@ -78,6 +82,15 @@ export const pptAgent = async (state) => {
         
     } catch (error) {
         console.log(error);
+
+        if(error.status==429){
+            return {
+             ...state,
+             aiResponse:
+             error?.data?.message
+         }
+        }
+        
         return {
              ...state,
              aiResponse:`
