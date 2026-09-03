@@ -3,6 +3,7 @@ import {
     CircleEuro,
     Coins,
   LogOut,
+  Menu,
   MessageSquare,
   PanelLeftIcon,
   PanelRight,
@@ -10,6 +11,7 @@ import {
   PenSquare,
   Plus,
   User,
+  X,
 } from "lucide-react";
 import { useState } from "react";
 import { getConversations } from "../features/getConversations";
@@ -40,6 +42,7 @@ function SideBar() {
 
   const [imageError,setImageError] = useState(false)
   const [showBilling,setShowBilling] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   useEffect(() => {
     const getConv = async () => {
@@ -71,7 +74,7 @@ function SideBar() {
             </button>
 
              <div className="flex-1 overflow-y-auto px-2.5 pb-2 scrollbar-none [&:: -webkit-scrollbar]:hidden pt-5">
-          {conversations.map((conv, i) => {
+          {conversations?.map((conv, i) => {
             const isActive = selectedConversation?._id == conv?._id;
             return (
               <div
@@ -111,7 +114,23 @@ function SideBar() {
   }
 
   return (
-    <div className="fixed lg:static inset-y-0 left-0 z-50 w-67.5 h-screen shrink-0 bg-[#0d0f14] border-r border-white/6">
+    <>
+      <button className="lg:hidden fixed top-3.5 left-4 z-50 flex items-center justify-center w-8 h-8 rounded-lg bg-[#0d0f14] border border-white/6 text-slate-400 hover:text-slate-200 transition-colors duration-150 cursor-pointer"
+      onClick={()=>setMobileOpen(true)}
+      >
+        <Menu size={14}/>
+      </button>
+
+      {mobileOpen && <div onClick={()=>setMobileOpen(false)} className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"/>}
+
+    <div className={`fixed lg:static inset-y-0 left-0 z-50 w-67.5 h-screen shrink-0 bg-[#0d0f14] border-r border-white/6 transition-transform duration-250
+    ${mobileOpen ? "translate-x-0": "-translate-x-full lg:translate-x-0"}`}
+    >
+
+
+
+
+
       <div className="flex flex-col h-full">
         <div className="flex items-center gap-2.5 px-4 py-4 border-b border-white/6">
           <div
@@ -120,11 +139,17 @@ function SideBar() {
           >
             <PanelLeftIcon />
           </div>
+
+          <button onClick={()=> setMobileOpen(false)}
+            className="lg:hidden flex items-center justify-center w-7 h-7 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-white/5 transition-colors duration-150 bg-transparent border-none cursor-pointer">
+            <X/>
+          </button>
+
           <span className="text-[16px] font-semibold text-slate-100 tracking-tight flex-1">
             MultiMind
           </span>
           <span className="text-[10px] font-medium text-blue-500 bg-indigo-500/10 border border-indigo-500/20 hover:border-blue-500 px-2 py-0.5 rounded-full tracking-wide">
-            Free
+           {userData?.plan.charAt(0).toUpperCase() + userData?.plan.slice(1)}
           </span>
           <button
             className="flex items-center justify-center w-7 h-7 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-white/5 transition-colors duration-150 bg-transparent border-none cursor-pointer"
@@ -150,7 +175,7 @@ function SideBar() {
           </button>
         </div>
 
-        {conversations.length == 0 ? (
+        {(!conversations || conversations.length === 0) ? (
           <div className="px-5 pt-4 pb-1.5 text-[10.5px] font-semibold uppercase tracking-widest text-slate-600">
             No Recent Conversations
           </div>
@@ -161,7 +186,7 @@ function SideBar() {
         )}
 
         <div className="flex-1 overflow-y-auto px-2.5 pb-2 scrollbar-none [&:: -webkit-scrollbar]:hidden">
-          {conversations.map((conv, i) => {
+          {conversations?.map((conv, i) => {
             const isActive = selectedConversation?._id == conv?._id;
             return (
               <div
@@ -211,7 +236,7 @@ function SideBar() {
                     {userData?.name || "user"}
                 </p>
                 <p className="text-[12px] text-slate-500 mt-px">
-                    {"Pro"}
+                    {userData?.plan.charAt(0).toUpperCase() + userData?.plan.slice(1)}
                 </p>
             </div>
                 <div className="flex gap-1">
@@ -239,9 +264,11 @@ function SideBar() {
 
       </div>
 
-      <BillingDrawer open={showBilling} onClose={()=>setShowBilling(false)}/>
+      
 
     </div>
+    <BillingDrawer open={showBilling} onClose={()=>setShowBilling(false)}/>
+    </>
   );
 
  
